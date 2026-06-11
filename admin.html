@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HimuTV Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0f14;--bg2:#141720;--bg3:#1c2030;--bg4:#242840;
+  --border:#2a2e45;--accent:#6c63ff;--green:#00c853;--red:#f44336;
+  --yellow:#ffd600;--text:#e8eaf6;--text2:#8892b0;--text3:#4a5280;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* LOGIN */
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  padding:36px 32px;width:100%;max-width:400px;text-align:center}
+.login-logo{font-size:1.6rem;font-weight:700;color:var(--accent);margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  padding:11px 14px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;
+  outline:none;transition:border .2s;margin-bottom:10px}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--text3)}
+.inp-label{text-align:left;font-size:11px;color:var(--text2);margin-bottom:4px;display:block}
+.btn{width:100%;background:var(--accent);border:none;border-radius:10px;
+  padding:12px;color:#fff;font-family:'Inter',sans-serif;font-size:14px;
+  font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:4px}
+.btn:hover{opacity:.9}
+.login-err{color:var(--red);font-size:13px;margin-top:10px;display:none}
+.login-hint{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6;text-align:left}
+.login-hint a{color:var(--accent);text-decoration:none}
+
+/* ADMIN */
+#admin-page{display:none;min-height:100vh;flex-direction:column}
+#admin-page.open{display:flex}
+#topbar{background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  flex-shrink:0;position:sticky;top:0;z-index:100}
+.admin-logo{font-size:1.1rem;font-weight:700;color:var(--accent);margin-right:4px}
+.tbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);
+  border-radius:8px;padding:7px 13px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;
+  transition:all .2s;white-space:nowrap}
+.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn:disabled{opacity:.4;cursor:not-allowed}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.tbtn.primary:hover{opacity:.9}
+.tbtn.success{border-color:var(--green);color:var(--green)}
+.tbtn.danger{border-color:var(--red);color:var(--red)}
+#save-status{font-size:11px;color:var(--text3);white-space:nowrap}
+#save-status.ok{color:var(--green)}
+#save-status.err{color:var(--red)}
+
+/* STATS */
+#stats-row{display:flex;gap:10px;padding:14px 20px;flex-wrap:wrap}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;flex:1;min-width:100px}
+.stat-n{font-size:1.5rem;font-weight:700;color:var(--accent)}
+.stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* TOOLBAR */
+#toolbar{display:flex;gap:10px;padding:0 20px 12px;flex-wrap:wrap;align-items:center}
+.filter-inp{background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;
+  outline:none;transition:border .2s;min-width:180px;flex:1;max-width:300px}
+.filter-inp:focus{border-color:var(--accent)}
+.filter-inp::placeholder{color:var(--text3)}
+select.filter-inp{cursor:pointer;max-width:180px}
+
+/* TABLE */
+#table-wrap{flex:1;overflow-x:auto;padding:0 20px 20px}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{background:var(--bg3)}
+th{text-align:left;padding:10px 12px;font-size:10px;color:var(--text2);
+  letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--border);
+  white-space:nowrap;font-weight:600}
+td{padding:9px 12px;border-bottom:1px solid rgba(42,46,69,.4);vertical-align:middle;font-size:13px}
+tr:hover td{background:rgba(108,99,255,.04)}
+.ch-logo{width:32px;height:32px;border-radius:6px;object-fit:contain;background:var(--bg3);flex-shrink:0}
+.ch-nm{font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-url{font-size:11px;color:var(--text3);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.cat-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;white-space:nowrap;
+  background:rgba(108,99,255,.15);color:var(--accent)}
+.spill{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.sl{background:rgba(0,200,83,.12);color:var(--green)}
+.sd{background:rgba(244,67,54,.12);color:var(--red)}
+.su{background:rgba(255,255,255,.05);color:var(--text3)}
+.act-btn{background:transparent;border:1px solid var(--border);color:var(--text2);
+  border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;transition:all .15s;margin:0 2px}
+.act-btn:hover{border-color:var(--accent);color:var(--accent)}
+.act-btn.del:hover{border-color:var(--red);color:var(--red)}
+.act-btn.pin-on{border-color:var(--yellow);color:var(--yellow)}
+.disabled-row td{opacity:.4}
+.no-rows{text-align:center;padding:50px;color:var(--text3)}
+
+/* MODAL */
+#mbg{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);
+  z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+#mbg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:480px;overflow:hidden}
+.mhdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center}
+.mtitle{font-size:15px;font-weight:600}
+.mclose{margin-left:auto;background:transparent;border:none;color:var(--text2);font-size:20px;cursor:pointer}
+.mbody{padding:20px;display:flex;flex-direction:column;gap:12px}
+.flabel{font-size:11px;color:var(--text2);margin-bottom:4px}
+.mfooter{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.chk-row{display:flex;gap:20px}
+.chk-row label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  padding:10px 18px;font-size:13px;color:var(--text);
+  opacity:0;transition:all .25s;transform:translateY(10px);white-space:nowrap;max-width:300px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{border-color:var(--green);color:var(--green)}
+#toast.err{border-color:var(--red);color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">🔐 HimuTV Admin</div>
+    <div class="login-sub">Channel Management Panel</div>
+    <label class="inp-label">Admin Password</label>
+    <input class="inp" type="password" id="pw-inp" placeholder="Password" autocomplete="off">
+    <label class="inp-label" style="margin-top:8px">GitHub Token (repo scope)</label>
+    <input class="inp" type="password" id="token-inp" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+    <button class="btn" id="login-btn">Login</button>
+    <div class="login-err" id="login-err"></div>
+    <div class="login-hint">
+      Token লাগবে: <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a><br>
+      → Tokens (classic) → Generate → ✅ repo scope → Copy
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-page">
+  <div id="topbar">
+    <span class="admin-logo">HimuTV Admin</span>
+    <button class="tbtn primary" id="add-btn">+ Add Channel</button>
+    <button class="tbtn success" id="save-btn">💾 Save to GitHub</button>
+    <button class="tbtn" id="export-btn">⬇ Export JSON</button>
+    <button class="tbtn" id="import-btn">⬆ Import JSON</button>
+    <input type="file" id="import-file" accept=".json" style="display:none">
+    <span id="save-status">Ready</span>
+    <button class="tbtn danger" onclick="logout()" style="margin-left:auto">Logout</button>
+  </div>
+
+  <div id="stats-row">
+    <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Total</div></div>
+    <div class="stat"><div class="stat-n" id="s-live" style="color:var(--green)">0</div><div class="stat-l">Live</div></div>
+    <div class="stat"><div class="stat-n" id="s-pinned" style="color:var(--yellow)">0</div><div class="stat-l">Pinned</div></div>
+    <div class="stat"><div class="stat-n" id="s-off" style="color:var(--red)">0</div><div class="stat-l">Disabled</div></div>
+  </div>
+
+  <div id="toolbar">
+    <input class="filter-inp" id="fsrch" type="text" placeholder="Search channels...">
+    <select class="filter-inp" id="fcat"><option value="">All Categories</option></select>
+    <select class="filter-inp" id="fst" style="max-width:150px">
+      <option value="">All Status</option>
+      <option value="live">Live</option>
+      <option value="dead">Dead</option>
+      <option value="pinned">Pinned</option>
+      <option value="disabled">Disabled</option>
+    </select>
+  </div>
+
+  <div id="table-wrap">
+    <table>
+      <thead><tr>
+        <th style="width:40px">Logo</th>
+        <th>Channel</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="mbg">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle" id="mtitle">Add Channel</div>
+      <button class="mclose" id="mclose">✕</button>
+    </div>
+    <div class="mbody">
+      <div><div class="flabel">Channel Name *</div><input class="inp" id="f-name" placeholder="T Sports HD" style="margin:0"></div>
+      <div><div class="flabel">Stream URL (m3u8) *</div><input class="inp" id="f-url" placeholder="https://example.com/stream.m3u8" style="margin:0"></div>
+      <div><div class="flabel">Logo URL</div><input class="inp" id="f-logo" placeholder="https://example.com/logo.png" style="margin:0"></div>
+      <div><div class="flabel">Category *</div>
+        <select class="inp" id="f-cat" style="margin:0;cursor:pointer">
+          <option>Football World Cup 2026</option>
+          <option>Cricket Live</option>
+          <option>Bangla News</option>
+          <option>Bangla Movies</option>
+          <option>Hindi Movies</option>
+          <option>Music</option>
+          <option>Islamic</option>
+          <option>Kids Zone</option>
+        </select>
+      </div>
+      <div class="chk-row">
+        <label><input type="checkbox" id="f-pin"> 📌 Pinned</label>
+        <label><input type="checkbox" id="f-en" checked> ✅ Enabled</label>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="tbtn" id="mcancel">Cancel</button>
+      <button class="tbtn primary" id="msave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const PASS = 'himu2024';
+const REPO = 'Rakibgemi/himutv';
+const FILE = 'channels.json';
+let TOKEN = '';
+let channels = [], editIdx = null;
+
+const FB = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect fill='%231c2030' width='32' height='32' rx='6'/><text x='16' y='22' text-anchor='middle' fill='%23444' font-size='16'>📺</text></svg>`;
+
+// ── LOGIN ──
+document.getElementById('login-btn').addEventListener('click', doLogin);
+['pw-inp','token-inp'].forEach(id=> document.getElementById(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); }));
+
+function doLogin(){
+  const pw = document.getElementById('pw-inp').value;
+  const tok = document.getElementById('token-inp').value.trim();
+  if(pw !== PASS){ showErr('Wrong password'); return; }
+  if(!tok.startsWith('ghp_') && !tok.startsWith('github_pat_')){ showErr('Invalid token format'); return; }
+  TOKEN = tok;
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('admin-page').classList.add('open');
+  loadChannels();
+}
+function showErr(msg){ const e=document.getElementById('login-err'); e.style.display='block'; e.textContent=msg; }
+function logout(){ location.reload(); }
+
+// ── LOAD ──
+async function loadChannels(){
+  setStatus('Loading...','');
+  try{
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${FILE}?t=`+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    channels = await r.json();
+    renderAll(); setStatus('Loaded ✓','ok');
+  }catch(e){ setStatus('Load failed','err'); toast('Load failed: '+e.message,'err'); }
+}
+
+function renderAll(){ updateStats(); buildCatFilter(); applyFilter(); }
+
+function updateStats(){
+  document.getElementById('s-total').textContent = channels.length;
+  document.getElementById('s-live').textContent = channels.filter(c=>c.status==='live').length;
+  document.getElementById('s-pinned').textContent = channels.filter(c=>c.pinned).length;
+  document.getElementById('s-off').textContent = channels.filter(c=>c.enabled===false).length;
+}
+function buildCatFilter(){
+  const cats=[...new Set(channels.map(c=>c.cat||c.group||'Other'))].sort();
+  const sel=document.getElementById('fcat'); const prev=sel.value;
+  sel.innerHTML='<option value="">All Categories</option>';
+  cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+  sel.value=prev;
+}
+
+['fsrch','fcat','fst'].forEach(id=>{ let t; document.getElementById(id).addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(applyFilter,200); }); });
+
+function applyFilter(){
+  const q=document.getElementById('fsrch').value.toLowerCase();
+  const cat=document.getElementById('fcat').value;
+  const st=document.getElementById('fst').value;
+  let list=channels;
+  if(q) list=list.filter(c=>c.name.toLowerCase().includes(q)||(c.url||'').includes(q));
+  if(cat) list=list.filter(c=>(c.cat||c.group||'Other')===cat);
+  if(st==='live') list=list.filter(c=>c.status==='live');
+  else if(st==='dead') list=list.filter(c=>c.status==='dead');
+  else if(st==='pinned') list=list.filter(c=>c.pinned);
+  else if(st==='disabled') list=list.filter(c=>c.enabled===false);
+  renderTable(list);
+}
+
+function renderTable(list){
+  const tb=document.getElementById('tbody');
+  if(!list.length){ tb.innerHTML='<tr><td colspan="5" class="no-rows">No channels found</td></tr>'; return; }
+  tb.innerHTML='';
+  list.forEach(ch=>{
+    const idx=channels.indexOf(ch);
+    const tr=document.createElement('tr');
+    if(ch.enabled===false) tr.className='disabled-row';
+    const dotCls=ch.status==='live'?'sl':ch.status==='dead'?'sd':'su';
+    const dotLbl=ch.status==='live'?'● Live':ch.status==='dead'?'● Dead':'● Unknown';
+    tr.innerHTML=`
+      <td><img class="ch-logo" src="${ch.logo||''}" alt="" onerror="this.src='${FB}'"></td>
+      <td><div class="ch-nm">${ch.pinned?'📌 ':''}${ch.name}</div><div class="ch-url">${ch.url||''}</div></td>
+      <td><span class="cat-badge">${ch.cat||ch.group||'—'}</span></td>
+      <td><span class="spill ${dotCls}">${dotLbl}</span></td>
+      <td>
+        <button class="act-btn" onclick="editCh(${idx})">✏️ Edit</button>
+        <button class="act-btn ${ch.pinned?'pin-on':''}" onclick="togglePin(${idx})">${ch.pinned?'📌':'📍'} Pin</button>
+        <button class="act-btn" onclick="toggleEnable(${idx})">${ch.enabled===false?'🟢 Enable':'🔴 Disable'}</button>
+        <button class="act-btn del" onclick="delCh(${idx})">🗑️</button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ── ACTIONS ──
+function togglePin(i){ channels[i].pinned=!channels[i].pinned; renderAll(); toast(channels[i].pinned?'📌 Pinned':'Unpinned'); }
+function toggleEnable(i){ channels[i].enabled=channels[i].enabled===false?true:false; renderAll(); toast(channels[i].enabled?'✅ Enabled':'🔴 Disabled'); }
+function delCh(i){ if(!confirm('Delete "'+channels[i].name+'"?')) return; const n=channels[i].name; channels.splice(i,1); renderAll(); toast('🗑️ Deleted: '+n); }
+
+// ── MODAL ──
+document.getElementById('add-btn').addEventListener('click',()=>{ editIdx=null; openModal(); });
+document.getElementById('mclose').addEventListener('click',closeModal);
+document.getElementById('mcancel').addEventListener('click',closeModal);
+document.getElementById('mbg').addEventListener('click',e=>{ if(e.target.id==='mbg') closeModal(); });
+
+function openModal(ch=null){
+  document.getElementById('mtitle').textContent=ch?'Edit Channel':'Add Channel';
+  document.getElementById('f-name').value=ch?.name||'';
+  document.getElementById('f-url').value=ch?.url||'';
+  document.getElementById('f-logo').value=ch?.logo||'';
+  document.getElementById('f-cat').value=ch?.cat||ch?.group||'Bangla News';
+  document.getElementById('f-pin').checked=!!ch?.pinned;
+  document.getElementById('f-en').checked=ch?.enabled!==false;
+  document.getElementById('mbg').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),100);
+}
+function closeModal(){ document.getElementById('mbg').classList.remove('open'); }
+function editCh(i){ editIdx=i; openModal(channels[i]); }
+
+document.getElementById('msave').addEventListener('click',()=>{
+  const name=document.getElementById('f-name').value.trim();
+  const url=document.getElementById('f-url').value.trim();
+  if(!name||!url){ toast('Name & URL required','err'); return; }
+  const ch={
+    name,url,
+    logo:document.getElementById('f-logo').value.trim(),
+    cat:document.getElementById('f-cat').value,
+    group:document.getElementById('f-cat').value,
+    pinned:document.getElementById('f-pin').checked,
+    enabled:document.getElementById('f-en').checked,
+    status:'live'
+  };
+  if(editIdx!==null){ channels[editIdx]={...channels[editIdx],...ch}; toast('✅ Updated'); }
+  else{ channels.unshift(ch); toast('✅ Added: '+name); }
+  closeModal(); renderAll();
+});
+
+// ── SAVE TO GITHUB ──
+document.getElementById('save-btn').addEventListener('click', saveToGitHub);
+async function saveToGitHub(){
+  const btn=document.getElementById('save-btn'); btn.disabled=true;
+  setStatus('Saving...','');
+  try{
+    const h={'Authorization':'token '+TOKEN,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};
+    const meta=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`,{headers:h}).then(r=>r.json());
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(channels,null,2))));
+    const r=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`,{
+      method:'PUT',headers:h,body:JSON.stringify({message:'Admin: update channels',content,sha:meta.sha})
+    });
+    if(!r.ok){ const d=await r.json(); throw new Error(d.message); }
+    setStatus('Saved! Netlify redeploys in ~30s','ok');
+    toast('✅ GitHub এ save হয়েছে!','ok');
+  }catch(e){ setStatus('Save failed','err'); toast('❌ '+e.message,'err'); }
+  btn.disabled=false;
+}
+
+// ── EXPORT / IMPORT ──
+document.getElementById('export-btn').addEventListener('click',()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(channels,null,2)],{type:'application/json'}));
+  a.download='channels.json'; a.click(); toast('⬇ Exported');
+});
+document.getElementById('import-btn').addEventListener('click',()=>document.getElementById('import-file').click());
+document.getElementById('import-file').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{ try{
+    const d=JSON.parse(ev.target.result);
+    if(!Array.isArray(d)) throw new Error('Not array');
+    if(!confirm('Import '+d.length+' channels? Current list will be replaced.')) return;
+    channels=d; renderAll(); toast('⬆ Imported: '+d.length+' channels');
+  }catch(err){ toast('❌ Invalid JSON','err'); } };
+  r.readAsText(f); e.target.value='';
+});
+
+function setStatus(msg,cls){ const e=document.getElementById('save-status'); e.textContent=msg; e.className=cls?cls:''; }
+function toast(msg,t='',dur=3000){ const el=document.getElementById('toast'); el.textContent=msg; el.className='show'+(t?' '+t:''); clearTimeout(el._t); el._t=setTimeout(()=>el.className='',dur); }
+</script>
+</body>
+</html>
