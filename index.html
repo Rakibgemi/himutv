@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<title>HimuTV Live — বাংলা লাইভ টিভি</title>
+<meta name="description" content="HimuTV Live — বাংলাদেশের সেরা ফ্রি লাইভ টিভি স্ট্রিমিং। World Cup, Cricket, Bangla News, Movies, Kids সব একসাথে।">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0a0f;
+  --bg2:#12121a;
+  --bg3:#1a1a26;
+  --bg4:#22223a;
+  --glass:rgba(255,255,255,.04);
+  --glass2:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.12);
+  --accent:#e50914;
+  --accent2:#ff6b35;
+  --gold:#f5c518;
+  --green:#00e676;
+  --blue:#00b4d8;
+  --text:#f0f0f0;
+  --text2:#a0a0b8;
+  --text3:#5a5a78;
+  --r:14px; /* card radius */
+  --frame:420px; /* max mobile frame width */
+}
+html{height:100%;background:#000}
+body{
+  min-height:100%;background:var(--bg);color:var(--text);
+  font-family:'Inter','Noto Sans Bengali',sans-serif;font-size:15px;
+  /* Center frame layout */
+  display:flex;justify-content:center;
+}
+/* CENTER FRAME — mobile app feel on desktop */
+#app{
+  width:100%;max-width:var(--frame);
+  min-height:100vh;background:var(--bg);
+  position:relative;overflow-x:hidden;
+  box-shadow:0 0 60px rgba(0,0,0,.8);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+#hdr{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,15,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.hdr-top{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px 8px;
+}
+.logo{
+  font-size:1.25rem;font-weight:700;color:#fff;letter-spacing:-.3px;
+  text-decoration:none;
+}
+.logo .hi{color:var(--accent)}
+.logo .mu{color:#fff}
+.logo .tv{color:var(--text2);font-size:.9em}
+.live-dot{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(229,9,20,.15);border:1px solid rgba(229,9,20,.3);
+  border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;
+  color:var(--accent);letter-spacing:.5px;
+}
+.live-dot::before{content:'';width:6px;height:6px;background:var(--accent);
+  border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hdr-actions{margin-left:auto;display:flex;gap:8px}
+.icon-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
+  background:var(--glass);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:17px;transition:all .2s;color:var(--text2);
+  text-decoration:none;
+}
+.icon-btn:hover,.icon-btn:active{background:var(--glass2);border-color:var(--border2)}
+
+/* Notice marquee */
+.notice-bar{
+  padding:6px 14px;background:rgba(245,197,24,.06);
+  border-bottom:1px solid rgba(245,197,24,.1);
+  font-size:12px;color:var(--gold);overflow:hidden;
+}
+.notice-inner{display:flex;gap:0;white-space:nowrap;animation:marquee 30s linear infinite}
+@keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+/* ══════════════════════════════
+   SEARCH MODAL
+══════════════════════════════ */
+#search-modal{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  align-items:flex-start;justify-content:center;padding-top:20px;
+}
+#search-modal.open{display:flex}
+.search-box{
+  width:calc(100% - 32px);max-width:400px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
+  overflow:hidden;
+}
+.search-top{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+#sinput{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-size:15px;font-family:inherit;
+}
+#sinput::placeholder{color:var(--text3)}
+#sclose{background:transparent;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1}
+#sresults{max-height:60vh;overflow-y:auto;padding:8px}
+.sr-item{
+  display:flex;align-items:center;gap:10px;padding:10px;
+  border-radius:10px;cursor:pointer;transition:background .15s;
+}
+.sr-item:hover,.sr-item:active{background:var(--glass2)}
+.sr-logo{width:38px;height:38px;border-radius:8px;object-fit:contain;background:var(--bg3);flex-shrink:0}
+.sr-name{font-size:13px;font-weight:500;color:var(--text)}
+.sr-cat{font-size:11px;color:var(--text3);margin-top:2px}
+.sr-empty{text-align:center;padding:30px;color:var(--text3);font-size:13px}
+
+/* ══════════════════════════════
+   CATEGORY TABS
+══════════════════════════════ */
+#tabs{
+  display:flex;gap:8px;padding:12px 14px;
+  overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+#tabs::-webkit-scrollbar{display:none}
+.tab{
+  display:flex;align-items:center;gap:6px;
+  white-space:nowrap;padding:8px 14px;border-radius:20px;
+  border:1px solid var(--border);background:transparent;
+  font-size:12.5px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:all .2s;font-family:inherit;flex-shrink:0;
+}
+.tab:hover{border-color:var(--border2);color:var(--text)}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.tab-all.on{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+
+/* ══════════════════════════════
+   PLAYER — slides down from top
+══════════════════════════════ */
+#player-section{display:none;flex-direction:column;background:#000}
+#player-section.open{display:flex}
+#pw{position:relative;background:#000;width:100%;aspect-ratio:16/9}
+#vid{width:100%;height:100%;display:block;object-fit:cover}
+#ovl{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:#000;z-index:5;gap:12px;
+}
+#ovl.gone{display:none}
+.spin{
+  width:44px;height:44px;
+  border:3px solid rgba(255,255,255,.1);border-top-color:var(--accent);
+  border-radius:50%;animation:sp .8s linear infinite;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ovl-txt{font-size:13px;color:var(--text2)}
+
+/* Skeleton loader */
+.skel{
+  position:absolute;inset:0;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;z-index:4;
+}
+.skel.gone{display:none}
+.skel-pulse{
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);
+  background-size:200%;animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+
+/* Player meta bar */
+#pmeta{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+}
+#pm-logo{width:32px;height:32px;border-radius:7px;object-fit:contain;flex-shrink:0}
+#pm-name{font-size:13px;font-weight:600;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pm-cat{font-size:11px;color:var(--text3);margin-top:1px}
+.badge-live{
+  background:var(--accent);color:#fff;font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:10px;letter-spacing:.5px;flex-shrink:0;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.ctrl-btn{
+  background:var(--glass);border:1px solid var(--border);color:var(--text2);
+  border-radius:8px;padding:5px 9px;cursor:pointer;font-size:11px;
+  font-family:inherit;transition:all .2s;flex-shrink:0;
+}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ══════════════════════════════
+   CONTENT AREA
+══════════════════════════════ */
+#content{padding:14px;padding-bottom:30px}
+
+/* Section header */
+.sec-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;margin-top:4px;
+}
+.sec-title{font-size:15px;font-weight:700;color:var(--text)}
+.sec-count{font-size:11px;color:var(--text3)}
+
+/* ── CHANNEL GRID ── */
+#ch-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+/* Channel Card */
+.chc{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  cursor:pointer;transition:transform .15s,border-color .15s;
+  position:relative;
+}
+.chc:active{transform:scale(.96)}
+.chc.on{border-color:var(--accent)}
+.chc-img-wrap{
+  aspect-ratio:1;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;position:relative;overflow:hidden;
+}
+/* shimmer skeleton */
+.chc-img-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.04) 50%,transparent 100%);
+  background-size:200%;animation:shimmer 2s infinite;
+  pointer-events:none;
+}
+.chc img{
+  width:100%;height:100%;object-fit:contain;border-radius:8px;
+  transition:opacity .3s;
+}
+.chc img.loading{opacity:0}
+.chc img.loaded{opacity:1}
+.chc-bottom{padding:7px 7px 8px;border-top:1px solid var(--border)}
+.chc-name{
+  font-size:11.5px;font-weight:500;color:var(--text2);
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  line-height:1.4;
+}
+.chc.on .chc-name{color:var(--accent)}
+/* status dot */
+.sdot{
+  position:absolute;top:6px;left:6px;width:7px;height:7px;
+  border-radius:50%;border:1.5px solid var(--bg2);z-index:2;
+}
+.sl{background:var(--green)} .sd{background:var(--accent)} .su{background:var(--text3)}
+/* fav btn */
+.fav{position:absolute;top:5px;right:5px;z-index:2;
+  background:rgba(0,0,0,.4);border:none;color:rgba(255,255,255,.3);
+  font-size:14px;cursor:pointer;border-radius:6px;padding:3px 5px;line-height:1;
+  transition:color .2s;backdrop-filter:blur(4px);
+}
+.fav.on{color:#ff4081}
+/* pin */
+.pin-badge{
+  position:absolute;bottom:5px;left:5px;z-index:2;
+  background:rgba(245,197,24,.15);color:var(--gold);
+  font-size:10px;border-radius:5px;padding:1px 5px;border:1px solid rgba(245,197,24,.2);
+}
+
+/* No results */
+.no-ch{
+  grid-column:1/-1;text-align:center;
+  padding:50px 20px;color:var(--text3);
+  font-size:13px;line-height:2;
+}
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+#footer{
+  padding:16px 14px 24px;background:var(--bg2);
+  border-top:1px solid var(--border);text-align:center;
+  font-size:12px;color:var(--text3);line-height:2;
+}
+#footer a{color:var(--blue);text-decoration:none}
+
+/* ══════════════════════════════
+   WHATSAPP FAB
+══════════════════════════════ */
+#wafab{
+  position:fixed;bottom:20px;
+  /* align with app frame */
+  z-index:200;
+  width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(37,211,102,.4);
+  text-decoration:none;transition:transform .2s;
+}
+#wafab:active{transform:scale(.92)}
+#wafab svg{width:28px;height:28px;fill:#fff}
+/* Position FAB inside app frame */
+@media(min-width:440px){
+  #wafab{right:calc(50% - 210px + 14px)}
+}
+@media(max-width:439px){
+  #wafab{right:14px}
+}
+
+/* ══════════════════════════════
+   TOAST
+══════════════════════════════ */
+#toast{
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--bg3);border:1px solid var(--border2);
+  padding:9px 18px;border-radius:10px;font-size:13px;
+  color:var(--text);z-index:999;
+  opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══════════════════════════════
+   DESKTOP FRAME BORDER
+══════════════════════════════ */
+@media(min-width:440px){
+  body{background:linear-gradient(135deg,#050508 0%,#0d0d15 100%)}
+  #app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+  #wafab{position:fixed}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="hdr-top">
+    <a class="logo" href="#"><span class="hi">Himu</span><span class="mu">TV</span> <span class="tv">Live</span></a>
+    <div class="live-dot">LIVE</div>
+    <div class="hdr-actions">
+      <button class="icon-btn" id="search-btn" title="Search">🔍</button>
+      <a class="icon-btn" href="https://t.me/johnsmit2" target="_blank" title="Telegram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.5 2L2 9.5l7 2.5 2.5 7 3-6 7-11z"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="notice-bar">
+    <div class="notice-inner">হিমুটিভি লাইভে আপনাকে স্বাগতম। আমরা সর্বদা চেষ্টা করি সেরা মানের লাইভ টিভি স্ট্রিমিং সেবা প্রদান করতে। কোনো চ্যানেলে সমস্যা দেখা দিলে অনুগ্রহ করে WhatsApp-এ অ্যাডমিনের সাথে যোগাযোগ করুন। ধন্যবাদ।&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+  </div>
+  <!-- CATEGORY TABS -->
+  <div id="tabs"></div>
+</div>
+
+<!-- SEARCH MODAL -->
+<div id="search-modal">
+  <div class="search-box">
+    <div class="search-top">
+      <span style="font-size:17px;color:var(--text3)">🔍</span>
+      <input id="sinput" type="text" placeholder="চ্যানেল খুঁজুন..." autocomplete="off" spellcheck="false">
+      <button id="sclose">✕</button>
+    </div>
+    <div id="sresults"></div>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div id="player-section">
+  <div id="pw">
+    <video id="vid" controls playsinline></video>
+    <div class="skel" id="skel"><div class="skel-pulse"></div></div>
+    <div id="ovl" class="gone">
+      <div style="font-size:2.5rem;opacity:.4">📺</div>
+      <div class="ovl-txt" id="ovl-txt">Loading stream...</div>
+    </div>
+  </div>
+  <div id="pmeta">
+    <img id="pm-logo" src="" alt="">
+    <div style="flex:1;min-width:0">
+      <div id="pm-name"></div>
+      <div id="pm-cat" style="font-size:11px;color:var(--text3);margin-top:1px"></div>
+    </div>
+    <span class="badge-live">● LIVE</span>
+    <button class="ctrl-btn" id="pip-btn">⧉</button>
+    <button class="ctrl-btn" id="shr-btn">⤴</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+  <div class="sec-hdr">
+    <div class="sec-title" id="sec-title">সব চ্যানেল</div>
+    <div class="sec-count" id="sec-count"></div>
+  </div>
+  <div id="ch-grid"></div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  🔴 HimuTV Live — সেরা লাইভ টিভি স্ট্রিমিং<br>
+  Developed by <a href="https://t.me/johnsmit2" target="_blank">Liton Shakh Himu</a>
+  &nbsp;|&nbsp;
+  <a href="https://t.me/johnsmit2" target="_blank">📢 Telegram</a>
+</div>
+
+</div><!-- #app -->
+
+<!-- WhatsApp FAB -->
+<a id="wafab" href="https://wa.me/8801602471543" target="_blank">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+<div id="toast"></div>
+
+<script>
+const CH = [{"name":"Football World Cup 2026","logo":"https://carboncredits.com/wp-content/uploads/2025/09/shutterstock_2306088965-e1757112807302.jpg","group":"Football World Cup 2026","url":"https://tvsen7.aynaott.com/tsports-hd/tracks-v1a1/mono.ts.m3u8","id":"footballworldcup2026-440","cat":"Football World Cup 2026"},{"name":"T Sports HD","logo":"https://s3.aynaott.com/storage/dbc585f70a60b9855b6e13a8ce4cb6f4","group":"Sports","url":"https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1779283784&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=3b4c5a2cfa872fa7f91ffbfb4aa0f658","status":"live","verified_at":"2026-06-04T15:05:55.822476","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Football World Cup 2026"},{"name":"T Sports HD","logo":"https://s3.aynaott.com/storage/dbc585f70a60b9855b6e13a8ce4cb6f4","group":"Sports","url":"https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1779283784&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=3b4c5a2cfa872fa7f91ffbfb4aa0f658","status":"live","verified_at":"2026-06-04T15:05:55.822476","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Football World Cup 2026"},{"name":"DD Sports","logo":"https://s3.aynaott.com/storage/188500190395c4de0e506d518925dcc4","group":"Sports","url":"https://cdn-6.pishow.tv/live/13/master.m3u8","status":"live","verified_at":"2026-06-04T15:05:56.113764","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Football World Cup 2026"},{"name":"PTV Sports","logo":"https://s3.aynaott.com/storage/9d9d7cbfba5a8ceea648bbd963ad1014","group":"Sports","url":"https://tvsen5.aynaott.com/PtvSports/index.m3u8?e=1779283784&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=db1789e36c278bf538489fac263e0ffb","status":"live","verified_at":"2026-06-04T15:05:55.820885","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Football World Cup 2026"},{"name":"A sports","logo":"https://s3.aynaott.com/storage/64de30d2df9b2a888cb73f17614a9a8b","group":"Sports","url":"https://tvsen6.aynaott.com/asports/index.m3u8?e=1779283785&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=356b906bf972b824782bb58c1ce0bb22","status":"live","verified_at":"2026-06-04T15:05:55.820885","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Football World Cup 2026"},{"name":"Willow HD TV","logo":"https://s3.aynaott.com/storage/94a778ec3219f7eb54bdf1ee07a95788","group":"Sports","url":"https://tvsen5.aynaott.com/willowhd/index.m3u8?e=1779283803&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=2fe7bf4f892cf09f80087b8146545bad","status":"live","verified_at":"2026-06-04T15:05:55.864529","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Football World Cup 2026"},{"name":"T Sports HD","logo":"https://s3.aynaott.com/storage/dbc585f70a60b9855b6e13a8ce4cb6f4","group":"Sports","url":"https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1779283784&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=3b4c5a2cfa872fa7f91ffbfb4aa0f658","status":"live","verified_at":"2026-06-04T15:05:55.822476","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Cricket Live"},{"name":"Cricbuzz","logo":"https://wapka-img.zuna.id/5708ceb8.png","group":"IPL-2026","url":"https://cdn.dadocric.st/embed2.php?id=willow","cat":"Cricket Live"},{"name":"Start Sports 1","logo":"https://wapka-img.zuna.id/5708ceb8.png","group":"IPL-2026","url":"https://cdn.dadocric.st/embed2.php?id=starsp1","cat":"Cricket Live"},{"name":"Start Sports 2","logo":"https://wapka-img.zuna.id/5708ceb8.png","group":"IPL-2026","url":"https://cdn.dadocric.st/embed2.php?id=starsp2","cat":"Cricket Live"},{"name":"Start Sports 1 Hindi","logo":"https://wapka-img.zuna.id/5708ceb8.png","group":"IPL-2026","url":"https://cdn.dadocric.st/embed2.php?id=starsp3","cat":"Cricket Live"},{"name":"Cricket Gold","logo":"https://s3.aynaott.com/storage/7d20b575edc4e4b5276faa8c246e72a4","group":"Sports","url":"https://tvsen6.aynaott.com/CricketGold/index.m3u8?e=1779283786&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=7c79e4f07ef8bf05e35ecffd9e056652","status":"live","verified_at":"2026-06-04T15:05:55.828697","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Cricket Live"},{"name":"DD Sports","logo":"https://s3.aynaott.com/storage/188500190395c4de0e506d518925dcc4","group":"Sports","url":"https://cdn-6.pishow.tv/live/13/master.m3u8","status":"live","verified_at":"2026-06-04T15:05:56.113764","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Cricket Live"},{"name":"PTV Sports","logo":"https://s3.aynaott.com/storage/9d9d7cbfba5a8ceea648bbd963ad1014","group":"Sports","url":"https://tvsen5.aynaott.com/PtvSports/index.m3u8?e=1779283784&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=db1789e36c278bf538489fac263e0ffb","status":"live","verified_at":"2026-06-04T15:05:55.820885","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Cricket Live"},{"name":"A sports","logo":"https://s3.aynaott.com/storage/64de30d2df9b2a888cb73f17614a9a8b","group":"Sports","url":"https://tvsen6.aynaott.com/asports/index.m3u8?e=1779283785&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=356b906bf972b824782bb58c1ce0bb22","status":"live","verified_at":"2026-06-04T15:05:55.820885","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Cricket Live"},{"name":"Willow HD TV","logo":"https://s3.aynaott.com/storage/94a778ec3219f7eb54bdf1ee07a95788","group":"Sports","url":"https://tvsen5.aynaott.com/willowhd/index.m3u8?e=1779283803&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=2fe7bf4f892cf09f80087b8146545bad","status":"live","verified_at":"2026-06-04T15:05:55.864529","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Cricket Live"},{"name":"News 24","logo":"https://raw.githubusercontent.com/subirkumarpaul/Logo/main/News%2024.png","group":"Bangla News","url":"https://owrcovcrpy.gpcdn.net/bpk-tv/1708/output/index.m3u8","id":"news24-494","cat":"Bangla News"},{"name":"SOMOY NEWS","logo":"https://static.wikia.nocookie.net/logopedia/images/8/8e/Somoy_Television.svg","group":"Bangla News","url":"https://owrcovcrpy.gpcdn.net/bpk-tv/1702/output/index.m3u8","id":"bdsomoynews-18","cat":"Bangla News"},{"name":"Jamuna TV","logo":"https://s3.aynaott.com/storage/aac6488b68844e5756ab46eb79659de8","group":"News","url":"https://tvsen6.aynaott.com/jamunatv/index.m3u8?e=1779283771&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=2592d440f00d65738bd7f6c5158ce486","status":"live","verified_at":"2026-06-04T15:05:55.726795","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"Channel 24","logo":"https://yt3.googleusercontent.com/8Q8MCd6ypr2Hzbp60VE_stJPl063kQYfeTxdIQkAXRfhdzxByLl0sJYHsk43uTM4W_cOzwcbPQ=s160-c-k-c0x00ffffff-no-rj","group":"Bangla News","url":"https://owrcovcrpy.gpcdn.net/bpk-tv/1703/output/index.m3u8","id":"bdchannel24-11","cat":"Bangla News"},{"name":"ATN News","logo":"https://s3.aynaott.com/storage/8a3c5215dc0b943dc0a80333c0ab21ce","group":"News","url":"https://tvsen6.aynaott.com/atnnews/index.m3u8?e=1779283767&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=9e9b363bb761a6f0d5547b465dfbbede","status":"live","verified_at":"2026-06-04T15:05:55.722176","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"Ekattor TV","logo":"https://s3.aynaott.com/storage/d91767995b2f2a54852c92bbbc20daa7","group":"News","url":"https://tvsen6.aynaott.com/ekattorbdtv/index.m3u8?e=1779283770&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=dc7810d37e97e9d5ef235e0781255c24","status":"live","verified_at":"2026-06-04T15:05:55.725238","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"DBC News","logo":"https://s3.aynaott.com/storage/2c5a73ac3f9772a9cb2d18df1b152545","group":"News","url":"https://tvsen6.aynaott.com/dbcnews/index.m3u8?e=1779283768&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=9e5c2851814ffe8483f21f50dfbcb4b9","status":"live","verified_at":"2026-06-04T15:05:55.726795","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"Independent Television","logo":"https://static.wikia.nocookie.net/etv-gspn-bangla/images/b/bb/Independent_logo_2011.png","group":"Bangla News","url":"https://owrcovcrpy.gpcdn.net/bpk-tv/1704/output/index.m3u8","id":"bdindependenttelevision-15","cat":"Bangla News"},{"name":"Somoy TV","logo":"https://i.postimg.cc/Qxn4JFNV/20250529-071147.png","group":"Bangladesh","url":"https://owrcovcrpy.gpcdn.net/bpk-tv/1702/output/1702-audio_113322_eng=113200-video=2202800.m3u8","cat":"Bangla News"},{"name":"Channel I","logo":"https://s3.aynaott.com/storage/8e998f20a9cc52cb8eb1f52a5bf38204","group":"Bangla","url":"https://tvsen6.aynaott.com/channeli/index.m3u8?e=1779283749&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=1d2782c406bc6c9f853716c3dc41a439","status":"live","verified_at":"2026-06-04T15:05:56.709940","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"NTV","logo":"https://s3.aynaott.com/storage/1a619c9b917eb35898020cd323e415a7","group":"Bangla","url":"https://tvsen5.aynaott.com/ntvbd/index.m3u8?e=1779283750&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=dac30ebda5dba60e895e85ddee645992","status":"live","verified_at":"2026-06-04T15:05:55.819301","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"RTV","logo":"https://s3.aynaott.com/storage/094587a26f2c5e4f2962104728ec8c5d","group":"Bangla","url":"https://tvsen5.aynaott.com/RtvHD/index.m3u8?e=1779283751&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=678f1f8ec03b1af7b76d013d33f45198","status":"live","verified_at":"2026-06-04T15:05:55.811525","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"Boishakhi TV","logo":"https://s3.aynaott.com/storage/58658d4594ca1ff3c5031c9d8e3d9fc0","group":"Bangla","url":"https://tvsen6.aynaott.com/boishakhitv/index.m3u8?e=1779283755&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=f3f4ec98ffbd9567c21e8b2ee98e32d5","status":"live","verified_at":"2026-06-04T15:05:55.701639","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla News"},{"name":"Independent TV","logo":"https://raw.githubusercontent.com/subirkumarpaul/Logo/main/Independent%20Television.png","group":"Bangla News","url":"https://owrcovcrpy.gpcdn.net/bpk-tv/1704/output/1704.m3u8","id":"independenttv-488","cat":"Bangla News"},{"name":"Jodi Kintu Tobuo","logo":"","group":"Bangla Movies","url":"http://10.16.100.214/iccftps14/iccftps14sasd4/Movies/Bangla/BD/Jodi%20Kintu%20Tobuo%20(2021)%201080p%20WEBDL.mp4","id":"jodikintutobuo-555","cat":"Bangla Movies"},{"name":"Antarjal","logo":"","group":"Bangla Movies","url":"http://103.225.94.27/Infobase/hdd-2/Bangla/Antarjal%20(2023)%201080p%20WEBDL.mp4","id":"antarjal-556","cat":"Bangla Movies"},{"name":"Surongo","logo":"https://upload.wikimedia.org/wikipedia/en/1/10/Surongo.jpeg","group":"Bangla Movies","url":"https://pub-d8f5af7f053343ed8295b16a145f6c1c.r2.dev/siam/[FGBDVibes]Surongo.(2023).480p.mkv","id":"surongo-645","cat":"Bangla Movies"},{"name":"Maasranga TV","logo":"https://s3.aynaott.com/storage/1b5cb8c7901739cd7d201a38d2ab4737","group":"Bangla","url":"https://tvsen5.aynaott.com/maasrangatv/index.m3u8?e=1779283753&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=d29aadd6d2d6f7a0a28fabc7830ae6e3","status":"live","verified_at":"2026-06-04T15:05:55.811525","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla Movies"},{"name":"NTV","logo":"https://s3.aynaott.com/storage/1a619c9b917eb35898020cd323e415a7","group":"Bangla","url":"https://tvsen5.aynaott.com/ntvbd/index.m3u8?e=1779283750&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=dac30ebda5dba60e895e85ddee645992","status":"live","verified_at":"2026-06-04T15:05:55.819301","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla Movies"},{"name":"Channel I","logo":"https://s3.aynaott.com/storage/8e998f20a9cc52cb8eb1f52a5bf38204","group":"Bangla","url":"https://tvsen6.aynaott.com/channeli/index.m3u8?e=1779283749&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=1d2782c406bc6c9f853716c3dc41a439","status":"live","verified_at":"2026-06-04T15:05:56.709940","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla Movies"},{"name":"RTV","logo":"https://s3.aynaott.com/storage/094587a26f2c5e4f2962104728ec8c5d","group":"Bangla","url":"https://tvsen5.aynaott.com/RtvHD/index.m3u8?e=1779283751&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=678f1f8ec03b1af7b76d013d33f45198","status":"live","verified_at":"2026-06-04T15:05:55.811525","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla Movies"},{"name":"ATN Bangla","logo":"https://s3.aynaott.com/storage/eff41809fca04f7c1da5481e135d7913","group":"Bangla","url":"https://tvsen5.aynaott.com/atnbangla/index.m3u8?e=1779283752&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=e20058ae495a80a83ec09cb9d82b9253","status":"live","verified_at":"2026-06-04T15:05:55.809967","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla Movies"},{"name":"Desh TV","logo":"https://s3.aynaott.com/storage/d10390e5434e8cb44172257abd714beb","group":"Bangla","url":"https://tvsen6.aynaott.com/deshtv/index.m3u8?e=1779283755&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=9cf4584fd86e1427935f23b30fd28799","status":"live","verified_at":"2026-06-04T15:05:55.712961","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Bangla Movies"},{"name":"Goldmines","logo":"https://static.wikia.nocookie.net/jhmovie/images/7/7b/Goldmines_logo.png/revision/latest?cb=20240404141630","group":"Hindi Movies","url":"https://cdn-2.pishow.tv/live/1459/master.m3u8","tvg_id":"Goldmines.in@SD","status":"live","verified_at":"2026-06-04T15:15:13.559629","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"goldmines-531","cat":"Hindi Movies"},{"name":"Zee Anmol Cinema","logo":"https://upload.wikimedia.org/wikipedia/commons/b/b4/Zee_Anmol_Cinema_logo.png","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/271/271_0.m3u8","tvg_id":"AnmolCinema.in@SD","status":"live","verified_at":"2026-06-04T15:10:44.504555","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"zeeanmolcinema-528","cat":"Hindi Movies"},{"name":"Zee Anmol TV","logo":"https://upload.wikimedia.org/wikipedia/commons/b/b4/Zee_Anmol_Cinema_logo.png","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/256/256_0.m3u8","tvg_id":"AnmolTV.in@SD","status":"live","verified_at":"2026-06-04T15:10:44.543282","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"zeeanmoltv-525","cat":"Hindi Movies"},{"name":"Zee Action","logo":"https://raw.githubusercontent.com/subirkumarpaul/Logo/main/Zee%20Action.png","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/270/270_0.m3u8","id":"zeeaction-527","cat":"Hindi Movies"},{"name":"Goldmines Bollywood","logo":"","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/52/52_0.m3u8","id":"goldminesbollywood-529","cat":"Hindi Movies"},{"name":"B4U Kadak","logo":"https://raw.githubusercontent.com/subirkumarpaul/Logo/main/B4U%20Movies.png","group":"Hindi Movies","url":"https://cdn-2.pishow.tv/live/227/master.m3u8","id":"b4ukadak-530","cat":"Hindi Movies"},{"name":"Manoranjan Movies","logo":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLOrrVnk_41l-x7vMswKXKH2YJYGL5TNx6MzOEbEvzUA&s","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/23/23_0.m3u8","id":"manoranjanmovies-532","cat":"Hindi Movies"},{"name":"Manoranjan Prime","logo":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLOrrVnk_41l-x7vMswKXKH2YJYGL5TNx6MzOEbEvzUA&s","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/345/345_0.m3u8","id":"manoranjanprime-533","cat":"Hindi Movies"},{"name":"Manoranjan Grend","logo":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLOrrVnk_41l-x7vMswKXKH2YJYGL5TNx6MzOEbEvzUA&s","group":"Hindi Movies","url":"http://103.175.73.12:8080/live/19/19_0.m3u8","id":"manoranjangrend-534","cat":"Hindi Movies"},{"name":"9XM (1080p)","logo":"https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_9XM/images/LOGO_HD/image.png","group":"Music","url":"https://9xjio.wiseplayout.com/9XM/master.m3u8","tvg_id":"9XM.in@SD","status":"live","verified_at":"2026-06-04T15:09:55.885052","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Music"},{"name":"9x Jalwa","logo":"https://s3.aynaott.com/storage/d2d8f00a60dc64dad6c0181cd86f7869","group":"Hindi","url":"https://tvsen6.aynaott.com/9xjalwa/index.m3u8?e=1779283896&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=c537db14645c6338e56ccd72bb375808","status":"live","verified_at":"2026-06-04T15:05:57.172978","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Music"},{"name":"MU | B4U Music India","logo":"https://static.wikia.nocookie.net/logopedia/images/d/dc/B4U_Music_logo_2014.png","group":"India","url":"https://cdn-2.pishow.tv/live/226/master.m3u8","status":"live","verified_at":"2026-06-04T15:05:57.317147","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"mub4umusicindia-100","cat":"Music"},{"name":"MU | YRF Music HD","logo":"https://a.jsrdn.com/hls/23146/yrf-music/logo_20240322_175611_70.png","group":"India","url":"https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01412-xiaomiasia-yrfmusic-xiaomi/playlist.m3u8","id":"muyrfmusichd-165","cat":"Music"},{"name":"like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0\" group-title=\"Sports\",KOZOOM TV (1080p)","logo":"https://i.imgur.com/M1Ee79b.png","group":"Sports","url":"https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/kozoom-tv/manifest.m3u8?ads.vf=CAJPqH6STD0","tvg_id":"KozoomTV.fr@SD","status":"live","verified_at":"2026-06-04T15:17:13.555616","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Music"},{"name":"Amazing Discoveries TV","logo":"https://www.adventisttv.org/assets/img/main/ADTV.png","group":"Educational","url":"https://uni01rtmp.tulix.tv/amazingdtv/amazingdtv/playlist.m3u8","tvg_id":"AmazingDiscoveriesTV.ca@SD","status":"live","verified_at":"2026-06-04T15:10:38.388728","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"amazingdiscoveriestv-234","cat":"Music"},{"name":"TUR | Power Turk","logo":"https://s3.aynaott.com/storage/c4f27e64c99b50629e7021b99ac9387a","group":"Music","url":"https://livetv.powerapp.com.tr/powerturkTV/powerturkhd.smil/playlist.m3u8","status":"live","verified_at":"2026-06-04T15:06:02.452105","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"turpowerturk-319","cat":"Music"},{"name":"HR | CMC TV","logo":"https://static.wikia.nocookie.net/logopedia/images/d/d0/CMC_TV.svg","group":"Music","url":"https://stream.cmctv.hr:49998/cmc/live.m3u8","tvg_id":"CMCTV.hr","tvg_name":"CMC TV","tvg_country":"HR","tvg_chno":"13","status":"live","verified_at":"2026-06-04T15:06:56.643830","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"hrcmctv-298","cat":"Music"},{"name":"EN | Oxygen Music","logo":"https://static.wikia.nocookie.net/logopedia/images/6/6c/Oxygen_2017.svg","group":"Music","url":"https://oxygenmusic.hu:2443/hls/oxygenmusic.m3u8","tvg_name":"Oxygen Music","tvg_country":"HU","tvg_chno":"3","status":"live","verified_at":"2026-06-04T15:07:28.133206","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"enoxygenmusic-271","cat":"Music"},{"name":"TR | TRT Müzik","logo":"https://static.wikia.nocookie.net/logopedia/images/f/f2/TRT_M%C3%BCzik_logo.svg","group":"Music","url":"https://tv-trtmuzik.medya.trt.com.tr/master.m3u8","tvg_name":"TRT Müzik","tvg_country":"TR","tvg_chno":"7","status":"live","verified_at":"2026-06-04T15:09:18.597711","status_code":200,"content_type":"application/x-mpegurl","id":"trtrtmzik-286","cat":"Music"},{"name":"EN | NOW 70s","logo":"ahttps://static.wikia.nocookie.net/logopedia/images/b/b9/NOW_70s_2022.png","group":"Music","url":"https://lightning-now70s-samsungnz.amagi.tv/playlist.m3u8","tvg_id":"Now70s.uk","tvg_name":"Now 70s","tvg_country":"GB","tvg_chno":"361","status":"live","verified_at":"2026-06-04T15:09:29.267684","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"ennow70s-268","cat":"Music"},{"name":"EN | Now Rock","logo":"https://buddytv.netlify.app/img/no-logo.png","group":"Music","url":"https://lightning-now90s-samsungnz.amagi.tv/playlist.m3u8","tvg_id":"NowRock.uk","tvg_name":"Now Rock","tvg_country":"GB","tvg_chno":"363","status":"live","verified_at":"2026-06-04T15:09:27.629990","status_code":200,"content_type":"application/vnd.apple.mpegurl","id":"ennowrock-270","cat":"Music"},{"name":"B4U Music","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEilXOuGttq9F58UPTuH3QZx-eSpH2qlunCRfruR4y9lPNr_D-5goUxfNOZzdj0cLwj89VCOwlaiz2ju4TjoZ2GhXQC1hOjhZVz2gFX9PjQl-BxJos3dq2WJQFl2oluHg-_1T9ES4Hs6LJ5QMcxsvkQFymYXZUV2vLvgACYc3aeahNDXSmap2ES7s5D94w/s600/Nur_20251219_134908_0000.png","group":"Music","url":"https://amg00877-b4unew-amg00877c3-xiaomi-in-5474.playouts.now.amagi.tv/playlist.m3u8","cat":"Music"},{"name":"Party Universe","logo":"https://tstatic.akash-go.com/cms-ui/images/custom-content/1778083145889.png","group":"Music","url":"https://nomawnoijl.gpcdn.net/akash/partyuniverse/playlist.m3u8","id":"partyuniverse-668","cat":"Music"},{"name":"Avang TV (1080p)","logo":"https://i.imgur.com/3I1n7fO.png","group":"Music","url":"https://hls.avang.live/hls/stream.m3u8","tvg_id":"AvangTV.us@SD","status":"live","verified_at":"2026-06-04T15:11:05.353770","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Music"},{"name":"BIZ Music","logo":"https://www.parsatv.com/index_files/channels/bizmusic.jpg","group":"Music","url":"https://fl.biztv.media/music_720_QAKpGmVUjaPApCNjpsgBxrdqNihAkl/tracks-v1a1/mono.m3u8","cat":"Music"},{"name":"BTA TV (720p)","logo":"https://i.imgur.com/vygOosC.png","group":"Music","url":"https://cloud.fastchannel.es/manifiest/hls/prog9/btatv.m3u8","tvg_id":"BTATV.ve@SD","status":"live","verified_at":"2026-06-04T15:11:36.018972","status_code":200,"content_type":"application/x-mpegurl","cat":"Music"},{"name":"Yrf Music","logo":"https://i.postimg.cc/hPFhzrTG/20250529_121624.png","group":"Music","url":"https://amg01412-xiaomiasia-yrfmusic-xiaomi-1rmk2.amagi.tv/ts-eu-w1-n2/playlist/amg01412-xiaomiasia-yrfmusic-xiaomi/cb573d1e786c678f9bd43d6fcef04382847b3dcb0e6c886470af4a9765d97800dbe8ae84ae5b910c4c9e1fc061017d360439cd1dd56c49c1da63b820743c4b21fdcde00080dd0d0cb1df11292ca36265299a7369cc350f7bd2ec5a2f803ebe764c53cb017c593f88f258a9734cc59e0a957f39e8fc8b307b24455a9c5a43e6a64cb7a9b30846d13df5e0014a957e14fa83439fd501b385865883438422a716c895f2dad1148be4ef598d6f77a02022405fbdc213b1c853b1d69b6d3c8f795a297437c790e335caa1e43d277debf6cac505b5739cc84d290146e935c8054de3dd4bd31b4d0fca325a8dff082b18b7cd5a2e03a8e4ab8bc1f852d769d6adf3d47f7098b94136178925ef2b253c9fead854aaf755c7e66dd5ef292a31cec711c0ddaad5bbf9cd6b8c35c6c2c39d3f6947774b57d50aecc93b9b61f6509ce33f6d1c414da69f15e383da553f2b0fa5884cdb1e1ef68adfd6915e759a2e4b1adb61df5a176583613f2bab7eafe84906e311038b3132ec4b75d1128edf02c1e78ab5486bcf9dad24d860e0b206d78c728a652e560fb6b2611f724573d4e1711e721ee740f7d8deee670363bda39a1ea19bfcbb9471df2d11bc632dc24e2570a8eeb9ce62ec/147/854x480_1724104/index.m3u8","cat":"Music"},{"name":"4 Kurd","logo":"https://www.aparatchi.com/images/chanells-logo/4kurd.svg","group":"Music","url":"https://4kuhls.persiana.live/hls/stream.m3u8","tvg_id":"4Kurd.fr@SD","status":"live","verified_at":"2026-06-04T15:09:53.385694","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Music"},{"name":"7 RadioVisione (720p)","logo":"https://radio7note.com/img/favicon/android-icon-192x192.png","group":"Music","url":"https://stream10.xdevel.com/video1s976543-1932/stream/playlist.m3u8","tvg_id":"7RadioVisione.it@HD","status":"live","verified_at":"2026-06-04T15:09:54.315980","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Music"},{"name":"Azan TV","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhCyGvtaPRQNOAgb4Br064UbVmhRJ8XLqSYpErsUCZlN3_pb3lti2hrw1ebo3HlLWwhNg-JFeBeKc9DCOUJUlBKJeEk3KnlcP3oCoHfClqXdb2FPjak-0KvYSsxeEzYpocTpMO448SS6ppF2zYgBKFpA4vX0wYdI94FNBWjMcfO0s5BGDVEzqaXx0hxhQ/s600/Nur_20251226_221642_0000.png","group":"Islamic","url":"https://dbcanada.sonarbanglatv.com/azantv/atv/index.m3u8","cat":"Islamic"},{"name":"Islamic TV","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgRXM2J7y2LkoE63vv2He9SF1dMo3pS9hmEC23wzJv3maIccQ1e912eTGNSN74Riwx03whZi5tyKXHKEDSFl4AO1JrwjCIlMhglN-nOjmGhBHBnhp1EqdLB5hwV3jHgKUDlzNFW1Cv8qrMylfmiIosSwFmK72-h-LTinSr1bpDVfNm1p8SlrILxKesdgw/s1080/1000008187.png","group":"Islamic","url":"https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/islamictvbd.stream/tracks-v1a1/mono.m3u8","cat":"Islamic"},{"name":"Makkah Live","logo":"https://i.imgur.com/colOISC.jpeg","group":"Islamic","url":"https://app24.jagobd.com.bd/c3VydmVyX8RpbEU9Mi8xNy8yMFDEEHGcfRgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcEdsEfeDeKiNkVN3PTOmdFseWRtaW51aiPhnPTI2/makkah.stream/tracks-v1a1/mono.m3u8","cat":"Islamic"},{"name":"Cartoon Network","logo":"https://s3.aynaott.com/storage/a89142109d049ae325fd1681b50bfffb","group":"Kids","url":"https://tvsen5.aynaott.com/cartoonnetwork/index.m3u8?e=1779283917&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=6f8487c9adac23cedcbca869d7d7a595","status":"live","verified_at":"2026-06-04T15:05:57.381719","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Disney Channel","logo":"https://s3.aynaott.com/storage/a0c74b576321da5aa33a69806401caf1","group":"Kids","url":"https://tvsen7.aynaott.com/disney/index.m3u8?e=1779283925&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=edae9ca94bed2313e48e56a9085b496d","status":"live","verified_at":"2026-06-04T15:05:57.468434","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Disney JR","logo":"https://s3.aynaott.com/storage/31a070024b6516e3738baec70168f0b6","group":"Kids","url":"https://tvsen7.aynaott.com/disneyjr/index.m3u8?e=1779283918&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=5269dc1176c26984cb3eff6a2c891c14","status":"live","verified_at":"2026-06-04T15:05:57.391005","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Nickelodeon","logo":"https://s3.aynaott.com/storage/bb2375af2d1ff8666f2c24fbcec3c541","group":"Kids","url":"https://tvsen7.aynaott.com/nicklodean/index.m3u8?e=1779283926&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=6cbf077eae56bf7598b035f3c466d2b1","status":"live","verified_at":"2026-06-04T15:05:57.485182","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Nickjr","logo":"https://s3.aynaott.com/storage/921409bfe77e2e3d32492116bc22fa3e","group":"Kids","url":"https://tvsen5.aynaott.com/nickjr/index.m3u8?e=1779283919&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=4708f179311f53518e4b1a8b697c8c1e","status":"live","verified_at":"2026-06-04T15:05:57.403238","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Disney XD","logo":"https://s3.aynaott.com/storage/f9b945284524683f1de8beb07ded8989","group":"Kids","url":"https://tvsen5.aynaott.com/disneyxd/index.m3u8?e=1779283925&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=ffdc9b78c58295f55906f225a10a425c","status":"live","verified_at":"2026-06-04T15:05:57.469896","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Nicktoons","logo":"https://s3.aynaott.com/storage/a130687320f6b07db4bc3729b9d5e96e","group":"Kids","url":"https://tvsen5.aynaott.com/nicktoons/index.m3u8?e=1779283918&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=bbed6be573aa4a90a753bfb8fc060038","status":"live","verified_at":"2026-06-04T15:05:57.395179","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Teen Nick","logo":"https://s3.aynaott.com/storage/5739277278d596533abbacc60ea694be","group":"Kids","url":"https://tvsen7.aynaott.com/teennick/index.m3u8?e=1779283927&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=3404b7a0258a1438c3f8204f2df21ddc","status":"live","verified_at":"2026-06-04T15:05:57.483598","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Moonbug Kids","logo":"https://s3.aynaott.com/storage/d9b8deaf735ee0954260c7b3b61f508d","group":"Kids","url":"https://tvsen6.aynaott.com/MoonbugKids/index.m3u8?e=1779283923&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=52145358ed3be27c1e34ba90b246262a","status":"live","verified_at":"2026-06-04T15:05:57.457208","status_code":200,"content_type":"application/vnd.apple.mpegurl","cat":"Kids Zone"},{"name":"Motu Patlu","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg21ZAgQbK7cWgg1jsBXguoD2T4TNjPxPDY0-fhefmIhX6SucV6RmhP_GbxvUTc3zUBCyuCVPM2Aylb_NbFqTDrIvMYhMGYO3iYMNDKvIWFF9MgSV3sTe2zPxHGnXQYvu9wbPUNxRgQz8Y_3V7Skc-vHbqSpEe-5J-G_NuBGAUrCtqWaplTaubIbpzsKw/s600/Nur_20251216_230424_0000.png","group":"Kids","url":"https://live20.bozztv.com/giatvplayout7/giatv-209622/tracks-v1a1/mono.ts.m3u8","cat":"Kids Zone"},{"name":"Gopal Bhar","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWh27tjd1FNVAOPSX0USYijfaEyINTkfaG0cPk8rzg61aDbyXSp2tBqxIb84p8UyhJLLNiDNC59fZD90u2gn52piHfUmy-ULyeZbf_mkRGvJKVKdwLYSOPiLEQJV2p8uvgVK-PB8ADIGcGotQOnNqrp4gTasKVqoxJ3sbt-77SeKqG-0frt2nLktDXlw/s600/Nur_20251216_230322_0000.png","group":"Kids","url":"https://live20.bozztv.com/giatvplayout7/giatv-209611/tracks-v1a1/mono.ts.m3u8","cat":"Kids Zone"},{"name":"Oggy & Cockroaches","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgRB4drGtiLC7n-WUv1Whw5zivy-mXgxQ_x3sidxEBL5bItoFPLDbbYPZ7IQ1yyk0xNc8Qz_E05I0CppL3bpp4iB2YvDvTPb9GAjmEbOwTJFBCTxOpQhlBIltjIPsbqloBL0Ah-4lSLtDCoQj6cQpmkkp082IQvRYN9bHTmEQIdkOkcKaB30168kd0qmw/s600/Nur_20251227_140437_0000.png","group":"Kids","url":"https://live20.bozztv.com/giatvplayout7/giatv-210728/tracks-v1a1/mono.ts.m3u8","cat":"Kids Zone"},{"name":"Batul the Great","logo":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjMOfC7NSiiuVI790ObTRdMxvxQxJKZ6txYs_yi2i8TyD49hKqiKe_B4Imw8apKnzx_4wYwLXrHaqTs8xHuFwasDJXtpwoYF_wIF9PaOwNPAzebYJNudCeSBFVLr_29AFty7aRMPu_GXn57d5ClKabsMZFDVwwWHE7EQhWnmuGaNBUvlaHArQNNarK14A/s1080/1000057901.png","group":"Kids","url":"https://live20.bozztv.com/giatvplayout7/giatv-209869/tracks-v1a1/mono.ts.m3u8","cat":"Kids Zone"},{"name":"0. Doraemon","logo":"https://static.wikia.nocookie.net/logopedia/images/e/e4/Doraemon2005.svg","group":"Kids","url":"https://live20.bozztv.com/giatvplayout7/giatv-209902/tracks-v1a1/mono.ts.m3u8","id":"0doraemon-421","cat":"Kids Zone"}];
+const CATS = [{"id": "wc2026", "label": "⚽ Football World Cup 2026", "short": "World Cup", "emoji": "⚽", "cat": "Football World Cup 2026"}, {"id": "cricket", "label": "🏏 Cricket Live", "short": "Cricket", "emoji": "🏏", "cat": "Cricket Live"}, {"id": "banglanews", "label": "📰 Bangla News", "short": "Bangla News", "emoji": "📰", "cat": "Bangla News"}, {"id": "banglamovie", "label": "🎬 Bangla Movies", "short": "Bangla Movies", "emoji": "🎬", "cat": "Bangla Movies"}, {"id": "hindimovie", "label": "🎞 Hindi Movies", "short": "Hindi Movies", "emoji": "🎞", "cat": "Hindi Movies"}, {"id": "music", "label": "🎵 Music", "short": "Music", "emoji": "🎵", "cat": "Music"}, {"id": "islamic", "label": "🕌 Islamic", "short": "Islamic", "emoji": "🕌", "cat": "Islamic"}, {"id": "kids", "label": "🧒 Kids Zone", "short": "Kids", "emoji": "🧒", "cat": "Kids Zone"}];
+const FB = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect fill='%231a1a26' width='48' height='48' rx='10'/><text x='24' y='33' text-anchor='middle' fill='%23444' font-size='24'>📺</text></svg>`;
+
+let curCat = 'all', curCh = null, hlsI = null;
+let favs = JSON.parse(localStorage.getItem('htv4_f')||'[]');
+
+// ── WATCHER COUNT ──
+let wc = 400 + Math.floor(Math.random()*300);
+setInterval(()=>{ wc += Math.floor(Math.random()*9)-4; wc=Math.max(300,Math.min(900,wc)); }, 5000);
+
+// ── TABS ──
+function buildTabs(){
+  const box = document.getElementById('tabs');
+  const allBtn = document.createElement('button');
+  allBtn.className = 'tab tab-all on'; allBtn.dataset.c = 'all';
+  allBtn.textContent = '📺 সব চ্যানেল';
+  allBtn.addEventListener('click', ()=>setTab('all', '📺 সব চ্যানেল'));
+  box.appendChild(allBtn);
+  CATS.forEach(c=>{
+    const b = document.createElement('button');
+    b.className = 'tab'; b.dataset.c = c.cat;
+    b.textContent = c.label;
+    b.addEventListener('click',()=>setTab(c.cat, c.label));
+    box.appendChild(b);
+  });
+}
+
+function setTab(cat, label){
+  curCat = cat;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.c===cat));
+  const filtered = cat==='all' ? CH : CH.filter(c=>c.cat===cat);
+  document.getElementById('sec-title').textContent = label;
+  document.getElementById('sec-count').textContent = filtered.length + ' চ্যানেল';
+  renderGrid(filtered);
+}
+
+// ── GRID ──
+function renderGrid(list){
+  const grid = document.getElementById('ch-grid');
+  document.getElementById('sec-count').textContent = list.length + ' চ্যানেল';
+  if(!list.length){
+    grid.innerHTML='<div class="no-ch">কোনো চ্যানেল পাওয়া যায়নি 📭</div>'; return;
+  }
+  const frag = document.createDocumentFragment();
+  list.forEach(ch=>{
+    const d = document.createElement('div');
+    d.className = 'chc' + (curCh?.name===ch.name?' on':'');
+    d.dataset.n = ch.name;
+    const dot = ch.status==='live'?'sl':ch.status==='dead'?'sd':'su';
+    const isFav = favs.includes(ch.name);
+    d.innerHTML = `
+      <div class="chc-img-wrap">
+        <span class="sdot ${dot}"></span>
+        <button class="fav${isFav?' on':''}" data-n="${ch.name}">♥</button>
+        ${ch.pinned?'<span class="pin-badge">📌 পিন</span>':''}
+        <img src="${ch.logo||''}" alt="${ch.name}" loading="lazy" class="loading" onerror="this.src='${FB}';this.classList.add('loaded')" onload="this.classList.remove('loading');this.classList.add('loaded')">
+      </div>
+      <div class="chc-bottom">
+        <div class="chc-name">${ch.name}</div>
+      </div>`;
+    d.addEventListener('click', e=>{
+      if(e.target.classList.contains('fav')) return;
+      play(ch);
+    });
+    d.querySelector('.fav').addEventListener('click', e=>{
+      e.stopPropagation();
+      toggleFav(ch.name);
+      e.target.classList.toggle('on', favs.includes(ch.name));
+    });
+    frag.appendChild(d);
+  });
+  grid.innerHTML=''; grid.appendChild(frag);
+}
+
+// ── PLAY ──
+function play(ch){
+  curCh = ch;
+  localStorage.setItem('htv4_last', ch.name);
+
+  // Open player
+  const ps = document.getElementById('player-section');
+  ps.classList.add('open');
+  ps.scrollIntoView({behavior:'smooth', block:'start'});
+
+  // Update card highlight
+  document.querySelectorAll('.chc').forEach(el=>el.classList.toggle('on', el.dataset.n===ch.name));
+
+  // Meta
+  const ml = document.getElementById('pm-logo');
+  ml.src = ch.logo||''; ml.onerror=()=>ml.src=FB;
+  document.getElementById('pm-name').textContent = ch.name;
+  document.getElementById('pm-cat').textContent = ch.cat || ch.group || '';
+
+  // Show skeleton
+  document.getElementById('skel').classList.remove('gone');
+  document.getElementById('ovl').classList.add('gone');
+
+  // Destroy old
+  if(hlsI){ hlsI.destroy(); hlsI=null; }
+  const vid = document.getElementById('vid');
+  vid.removeAttribute('src'); vid.load();
+
+  if(!ch.url){
+    showOvl('⛔', 'কোনো স্ট্রিম URL নেই'); return;
+  }
+
+  if(Hls.isSupported()){
+    hlsI = new Hls({enableWorker:true, lowLatencyMode:true, maxBufferLength:30});
+    hlsI.loadSource(ch.url);
+    hlsI.attachMedia(vid);
+    hlsI.on(Hls.Events.MANIFEST_PARSED, ()=>{
+      document.getElementById('skel').classList.add('gone');
+      document.getElementById('ovl').classList.add('gone');
+      vid.play().catch(()=>{});
+    });
+    hlsI.on(Hls.Events.ERROR, (_,d)=>{
+      if(d.fatal){
+        document.getElementById('skel').classList.add('gone');
+        showOvl(d.type===Hls.ErrorTypes.NETWORK_ERROR?'📡':'⛔',
+          'স্ট্রিম পাওয়া যাচ্ছে না। অন্য চ্যানেল ট্রাই করুন।');
+      }
+    });
+  } else if(vid.canPlayType('application/vnd.apple.mpegurl')){
+    vid.src=ch.url;
+    document.getElementById('skel').classList.add('gone');
+    vid.play().catch(()=>{});
+  } else {
+    showOvl('⚠️','এই ব্রাউজারে HLS সাপোর্ট নেই');
+  }
+}
+
+function showOvl(icon, msg){
+  document.getElementById('skel').classList.add('gone');
+  const o = document.getElementById('ovl');
+  o.innerHTML = `<div style="font-size:2.5rem;opacity:.5">${icon}</div><div class="ovl-txt">${msg}</div>`;
+  o.classList.remove('gone');
+}
+
+// ── FAVS ──
+function toggleFav(n){
+  const i=favs.indexOf(n); i>=0?favs.splice(i,1):favs.unshift(n);
+  localStorage.setItem('htv4_f',JSON.stringify(favs));
+}
+
+// ── SEARCH ──
+function setupSearch(){
+  const btn = document.getElementById('search-btn');
+  const modal = document.getElementById('search-modal');
+  const input = document.getElementById('sinput');
+  const close = document.getElementById('sclose');
+  const results = document.getElementById('sresults');
+  const FB2 = FB;
+
+  btn.addEventListener('click',()=>{ modal.classList.add('open'); setTimeout(()=>input.focus(),100); });
+  close.addEventListener('click',()=>{ modal.classList.remove('open'); input.value=''; results.innerHTML=''; });
+  modal.addEventListener('click',e=>{ if(e.target===modal){ modal.classList.remove('open'); } });
+
+  let t;
+  input.addEventListener('input',()=>{
+    clearTimeout(t); t=setTimeout(()=>{
+      const q=input.value.toLowerCase().trim();
+      if(!q){ results.innerHTML=''; return; }
+      const found = CH.filter(c=>c.name.toLowerCase().includes(q)||(c.cat||'').toLowerCase().includes(q)).slice(0,20);
+      if(!found.length){ results.innerHTML='<div class="sr-empty">কিছু পাওয়া যায়নি</div>'; return; }
+      const frag = document.createDocumentFragment();
+      found.forEach(ch=>{
+        const d=document.createElement('div'); d.className='sr-item';
+        d.innerHTML=`<img class="sr-logo" src="${ch.logo||''}" alt="" onerror="this.src='${FB2}'">
+          <div><div class="sr-name">${ch.name}</div><div class="sr-cat">${ch.cat||ch.group||''}</div></div>`;
+        d.addEventListener('click',()=>{ modal.classList.remove('open'); play(ch); });
+        frag.appendChild(d);
+      });
+      results.innerHTML=''; results.appendChild(frag);
+    }, 200);
+  });
+}
+
+// ── PiP ──
+document.getElementById('pip-btn').addEventListener('click',()=>{
+  const v=document.getElementById('vid');
+  if(document.pictureInPictureElement) document.exitPictureInPicture();
+  else if(v.readyState>=2) v.requestPictureInPicture().catch(()=>toast('PiP সাপোর্ট নেই'));
+  else toast('আগে একটি চ্যানেল চালু করুন');
+});
+
+// ── SHARE ──
+document.getElementById('shr-btn').addEventListener('click',()=>{
+  if(!curCh) return;
+  const u = location.origin+location.pathname+'?ch='+encodeURIComponent(curCh.name);
+  navigator.clipboard.writeText(u).then(()=>toast('লিংক কপি হয়েছে! ✓')).catch(()=>prompt('লিংক কপি করুন:',u));
+});
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT') return;
+  const v=document.getElementById('vid');
+  if(e.code==='Space'){e.preventDefault();v.paused?v.play():v.pause();}
+  if(e.code==='KeyF') v.requestFullscreen?.();
+  if(e.code==='KeyM') v.muted=!v.muted;
+});
+
+// ── TOAST ──
+function toast(msg,dur=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+// ── INIT ──
+buildTabs();
+setTab('all', '📺 সব চ্যানেল');
+setupSearch();
+
+// Resume last
+const last = localStorage.getItem('htv4_last');
+if(last){ const ch=CH.find(c=>c.name===last); if(ch) setTimeout(()=>play(ch),400); }
+
+// URL param
+const urlCh = new URLSearchParams(location.search).get('ch');
+if(urlCh){ const ch=CH.find(c=>c.name===decodeURIComponent(urlCh)); if(ch) setTimeout(()=>play(ch),400); }
+</script>
+</body>
+</html>
