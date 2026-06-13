@@ -247,6 +247,25 @@ body{min-height:100%;background:var(--bg);color:var(--text);
   body{background:linear-gradient(135deg,#05050a,#0e0e18)}
   #app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
 }
+
+/* ══ ALERT BAR ══ */
+.alert-bar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:7px 12px;background:rgba(245,197,24,.08);
+  border-bottom:1px solid rgba(245,197,24,.15);flex-shrink:0;
+}
+.alert-icon{font-size:13px;flex-shrink:0}
+.alert-text{font-size:11.5px;color:#e0c97f;line-height:1.5;flex:1;min-width:0}
+.alert-link{
+  display:inline-flex;align-items:center;gap:4px;flex-shrink:0;
+  background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);
+  color:var(--gold);font-size:11px;font-weight:600;
+  padding:4px 10px;border-radius:20px;text-decoration:none;
+  transition:all .2s;white-space:nowrap;
+}
+.alert-link:hover,.alert-link:active{
+  background:rgba(245,197,24,.25);border-color:var(--gold);color:#fff;
+}
 </style>
 </head>
 <body>
@@ -265,6 +284,12 @@ body{min-height:100%;background:var(--bg);color:var(--text);
   </div>
 </div>
 
+<!-- ALERT BAR -->
+<div class="alert-bar">
+  <span class="alert-icon">⚠️</span>
+  <span class="alert-text">সাময়িক অসুবিধার জন্য দুঃখিত। সার্ভার সমস্যা হলে আমাদের ব্যাকআপ সাইট ভিজিট করুন →</span>
+  <a class="alert-link" href="https://himutv3.netlify.app/" target="_blank">🔗 Backup Site</a>
+</div>
 <!-- NOTICE -->
 <div class="notice">
   <div class="notice-inner">হিমুটিভি লাইভে আপনাকে স্বাগতম। আমরা সর্বদা চেষ্টা করি সেরা মানের লাইভ টিভি স্ট্রিমিং সেবা প্রদান করতে। কোনো চ্যানেলে সমস্যা হলে WhatsApp-এ অ্যাডমিনকে জানান। ধন্যবাদ।&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
