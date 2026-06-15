@@ -657,11 +657,21 @@ document.body.appendChild(loaderEl);
 
   // Resume last
   const last=localStorage.getItem('htv5_last');
-  if(last){ const ch=CH.find(c=>c.name===last); if(ch) setTimeout(()=>play(ch),500); }
-
-  // URL param
   const urlCh=new URLSearchParams(location.search).get('ch');
-  if(urlCh){ const ch=CH.find(c=>c.name===decodeURIComponent(urlCh)); if(ch) setTimeout(()=>play(ch),400); }
+
+  if(urlCh){
+    // URL param takes highest priority
+    const ch=CH.find(c=>c.name===decodeURIComponent(urlCh));
+    if(ch) setTimeout(()=>play(ch),400);
+  } else if(last){
+    // Resume last watched
+    const ch=CH.find(c=>c.name===last);
+    if(ch) setTimeout(()=>play(ch),500);
+  } else {
+    // Default: Auto-play FIFA World Cup 2026 Live
+    const defaultCh=CH.find(c=>c.name==='FIFA World Cup 2026 Live');
+    if(defaultCh) setTimeout(()=>play(defaultCh),600);
+  }
 })();
 </script>
 </body>
